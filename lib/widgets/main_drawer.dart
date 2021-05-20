@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:myshop/Providers/auth.dart';
 import 'package:myshop/screens/order_screen.dart';
 import 'package:myshop/screens/products_overview_screen.dart';
 import 'package:myshop/screens/products_screen.dart';
+import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
   Widget buildListTile(String title, IconData icon, Function navHandler) {
@@ -63,6 +65,18 @@ class MainDrawer extends StatelessWidget {
             () {
               Navigator.of(context)
                   .pushReplacementNamed(ProductsScreen.routeName);
+            },
+          ),
+          Divider(),
+          buildListTile(
+            'Log Out',
+            Icons.exit_to_app,
+                () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/');
+              Provider.of<Auth>(context,listen: false).logOut();
+              // Navigator.of(context)
+              //     .pushReplacementNamed(ProductsScreen.routeName);
             },
           ),
           Divider(),

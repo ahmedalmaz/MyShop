@@ -8,13 +8,14 @@ import 'package:provider/provider.dart';
 class ProductsScreen extends StatelessWidget {
   static const routeName = '/productsScreen';
 
-  Future<void> _refreshProducts ( BuildContext context)async{
-   await Provider.of<Products>(context, listen: false).fetchAndGetProducts();
-
+  Future<void> _refreshProducts(BuildContext context) async {
+    await Provider.of<Products>(context, listen: false)
+        .fetchAndGetProducts(true);
   }
+
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<Products>(context);
+    // final products = Provider.of<Products>(context);
     return Scaffold(
       drawer: MainDrawer(),
       appBar: AppBar(
@@ -28,22 +29,32 @@ class ProductsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: ()=>_refreshProducts(context),
-        child: Padding(
-            padding: EdgeInsets.all(8),
-            child: ListView.builder(
-                itemCount: products.items.length,
-                itemBuilder: (ctx, index) => Column(
-                      children: [
-                        ProductsManageItem(
-                          title: products.items[index].title,
-                          imageUrl: products.items[index].imageUrl,
-                          id: products.items[index].id,
-                        ),
-                        Divider(),
-                      ],
-                    ))),
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (ctx, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    onRefresh: () => _refreshProducts(context),
+                    child: Consumer<Products>(
+                      builder:(ctx ,products ,_)=> Padding(
+                          padding: EdgeInsets.all(8),
+                          child: ListView.builder(
+                              itemCount: products.items.length,
+                              itemBuilder: (ctx, index) => Column(
+                                    children: [
+                                      ProductsManageItem(
+                                        title: products.items[index].title,
+                                        imageUrl: products.items[index].imageUrl,
+                                        id: products.items[index].id,
+                                      ),
+                                      Divider(),
+                                    ],
+                                  ))),
+                    ),
+                  ),
       ),
     );
   }

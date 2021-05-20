@@ -21,7 +21,7 @@ class _OrderItemState extends State<OrderItem> {
         Card(
           margin: EdgeInsets.all(10),
           child: ListTile(
-            title: Text('\$${widget.order.amount}'),
+            title: Text('\$${widget.order.amount.toStringAsFixed(2)}'),
             subtitle: Text(
               DateFormat('dd/MM/yyyy   hh:mm').format(widget.order.dateTime),
             ),

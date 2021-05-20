@@ -39,6 +39,9 @@ class Products with ChangeNotifier {
     //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     // ),
   ];
+  final String authToken;
+  final String userId;
+  Products(this.authToken, this._items, this.userId);
 
   List<Product> get items {
     return [..._items];
@@ -63,7 +66,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final uri = Uri.parse(
-        'https://my-shop-c1620-default-rtdb.firebaseio.com/product/$id.json');
+        'https://my-shop-c1620-default-rtdb.firebaseio.com/product/$id.json?auth=$authToken');
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     var product = _items[prodIndex];
     _items.removeAt(prodIndex);
@@ -73,30 +76,38 @@ class Products with ChangeNotifier {
     if (response.statusCode >= 400) {
       _items.insert(prodIndex, product);
       notifyListeners();
-      throw HttpException('some thing went wrong ') ;
+      throw HttpException('some thing went wrong ');
     }
     product = null;
-
   }
 
-  Future<void> fetchAndGetProducts() async {
+  Future<void> fetchAndGetProducts([bool filterByUser = false]) async {
+    final filtering =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
     final uri = Uri.parse(
-        'https://my-shop-c1620-default-rtdb.firebaseio.com/product.json');
+        'https://my-shop-c1620-default-rtdb.firebaseio.com/product.json?auth=$authToken&$filtering');
     try {
       final response = await http.get(uri);
       final products = json.decode(response.body) as Map<String, dynamic>;
       final List<Product> productsList = [];
-      if(products==null){
+      if (products == null) {
         return;
       }
+      final url = Uri.parse(
+          'https://my-shop-c1620-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken');
+
+      final responseFav = await http.get(url);
+      final favorites = json.decode(responseFav.body);
+
       products.forEach((prodId, prodData) {
         productsList.add(Product(
-            id: prodId,
-            title: prodData['title'],
-            price: prodData['price'],
-            description: prodData['description'],
-            imageUrl: prodData['imageUrl'],
-            isFavorite: prodData['isFavorite']));
+          id: prodId,
+          title: prodData['title'],
+          price: prodData['price'],
+          description: prodData['description'],
+          imageUrl: prodData['imageUrl'],
+          isFavorite: favorites == null ? false : favorites[prodId] ?? false,
+        ));
       });
       _items = productsList;
       // for(int i = 0 ; i <= products.length ;i++){
@@ -114,15 +125,14 @@ class Products with ChangeNotifier {
       // print(json.decode(response.body));
 
     } catch (error) {
-      print(error);
-
+      print(error.toString());
       throw error;
     }
   }
 
   Future<void> addProduct(Product prod) async {
     final uri = Uri.parse(
-        'https://my-shop-c1620-default-rtdb.firebaseio.com/product.json');
+        'https://my-shop-c1620-default-rtdb.firebaseio.com/product.json?auth=$authToken');
     try {
       final response = await http.post(
         uri,
@@ -132,7 +142,7 @@ class Products with ChangeNotifier {
             'description': prod.description,
             'imageUrl': prod.imageUrl,
             'price': prod.price,
-            'isFavorite': prod.isFavorite
+            'creatorId': userId
           },
         ),
       );
@@ -156,14 +166,14 @@ class Products with ChangeNotifier {
 
     if (index >= 0) {
       final uri = Uri.parse(
-          'https://my-shop-c1620-default-rtdb.firebaseio.com/product/$id.json');
+          'https://my-shop-c1620-default-rtdb.firebaseio.com/product/$id.json?auth=$authToken');
       await http.patch(uri,
           body: json.encode({
             'title': newProduct.title,
             'description': newProduct.description,
             'price': newProduct.price,
             'imageUrl': newProduct.imageUrl,
-            'isFavorite':newProduct.isFavorite
+            'isFavorite': newProduct.isFavorite
           }));
       _items[index] = newProduct;
       notifyListeners();

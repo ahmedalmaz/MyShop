@@ -11,45 +11,59 @@ class ProductDetailsScreen extends StatelessWidget {
     final loadProduct =
         Provider.of<Products>(context, listen: false).findById(productId);
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loadProduct.title),
-      ),
-      body: SingleChildScrollView(
-          child: Column(
+      // appBar: AppBar(
+      //   title: Text(loadProduct.title),
+      // ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 400,
+            pinned: true,
+            flexibleSpace: FlexibleSpaceBar(
+              title:Text(loadProduct.title),
+              background:Hero(
+                tag: loadProduct.id,
+                child: Image.network(
+                  loadProduct.imageUrl,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          SliverList(delegate:SliverChildListDelegate([
+            SizedBox(
+              height: 10,
+            ),
+            Center(
+              child: Text(
+                '\$ ${loadProduct.price}',
+                style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 30
+                ),
+              ),
+            ),
 
-        children: [
-          Container(
-            height: 400,
-            width: double.infinity,
-            child: Image.network(
-              loadProduct.imageUrl,
-              fit: BoxFit.cover,
+            SizedBox(
+              height: 10,
             ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            '\$ ${loadProduct.price}',
-            style: TextStyle(
-              color: Theme.of(context).primaryColor,
-              fontWeight: FontWeight.bold,
-              fontSize: 30
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          Text(
-            ' ${loadProduct.description}',
-            style: TextStyle(
-                color: Colors.grey,
+            Center(
+              child: Text(
+                ' ${loadProduct.description}',
+                style: TextStyle(
+                    color: Colors.grey,
 
-                fontSize: 25
+                    fontSize: 25
+                ),
+              ),
             ),
-          )
+            SizedBox(
+              height: 800,
+            ),
+          ]) )
         ],
-      )),
+        ),
     );
   }
 }

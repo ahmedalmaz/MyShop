@@ -15,7 +15,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedProduct = Provider.of<Product>(context, listen: false);
-    final authData=Provider.of<Auth>(context , listen: false);
+    final authData = Provider.of<Auth>(context, listen: false);
     final cart = Provider.of<Cart>(context, listen: false);
     // var isf=selectedProduct.isFavorite;
     // void saveFav(String id , bool fav) async {
@@ -38,22 +38,25 @@ class ProductItem extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       child: GridTile(
         child: GestureDetector(
-          onTap: () {
-            Navigator.of(context).pushNamed(ProductDetailsScreen.routName,
-                arguments: selectedProduct.id);
-          },
-          child: Image.network(
-            selectedProduct.imageUrl,
-            fit: BoxFit.cover,
-          ),
-        ),
+            onTap: () {
+              Navigator.of(context).pushNamed(ProductDetailsScreen.routName,
+                  arguments: selectedProduct.id);
+            },
+            child: Hero(
+              tag: selectedProduct.id,
+              child: FadeInImage(
+                placeholder: AssetImage('assets/images/product-placeholder.png'),
+                image: NetworkImage(selectedProduct.imageUrl),
+                fit: BoxFit.cover,
+              ),
+            )),
         footer: GridTileBar(
           leading: Consumer<Product>(
             builder: (ctx, product, child) => IconButton(
               icon: Icon(
                   product.isFavorite ? Icons.favorite : Icons.favorite_border),
               onPressed: () {
-                product.toggleFavorite(authData.token,authData.userId);
+                product.toggleFavorite(authData.token, authData.userId);
                 // saveFav(selectedProduct.id,product.isFavorite);
               },
               color: Theme.of(context).accentColor,

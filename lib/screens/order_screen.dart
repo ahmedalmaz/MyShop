@@ -37,7 +37,7 @@ class _OrderScreenState extends State<OrderScreen> {
       body:isLoading? Center(
         child: CircularProgressIndicator(),
       ) : ListView.builder(itemCount:order.orders.length,
-      itemBuilder: (ctx, index)=>OrderItem(order.orders[index]),
+      itemBuilder: (ctx, index)=>OrderItem(order.orders[index]), 
       ),
     );
   }

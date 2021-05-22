@@ -3,6 +3,7 @@ import 'package:myshop/Providers/auth.dart';
 import 'package:myshop/Providers/cart.dart';
 import 'package:myshop/Providers/order.dart';
 import 'package:myshop/Providers/products.dart';
+import 'package:myshop/helpers/custome_route.dart';
 import 'package:myshop/screens/auth_screen.dart';
 import 'package:myshop/screens/cart_screen.dart';
 import 'package:myshop/screens/order_screen.dart';
@@ -44,6 +45,10 @@ class MyApp extends StatelessWidget {
         builder: (ctx, auth, _) => MaterialApp(
           title: ' My Shop',
           theme: ThemeData(
+              pageTransitionsTheme: PageTransitionsTheme(builders: {
+                TargetPlatform.android:CustomPageTransitionBuilder(),
+                TargetPlatform.iOS:CustomPageTransitionBuilder()
+              }),
               primarySwatch: Colors.teal,
               accentColor: Colors.tealAccent,
               fontFamily: 'Lato'),
@@ -56,6 +61,7 @@ class MyApp extends StatelessWidget {
                               ConnectionState.waiting
                           ? SplashScreen()
                           : AuthScreen()),
+
           routes: {
             AuthScreen.routeName: (ctx) => AuthScreen(),
             ProductOverviewScreen.routName: (ctx) => ProductOverviewScreen(),
